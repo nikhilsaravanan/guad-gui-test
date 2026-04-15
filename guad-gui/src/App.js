@@ -364,6 +364,10 @@ function App() {
     let values = data.split(',').map(Number);
     
     let stateCode = values[1];
+    if (isNaN(stateCode) || stateCode < 0 || stateCode >= stateDescriptions.length) {
+      console.error("Invalid stateCode:", stateCode, "from data:", dataString);
+      return;
+    }
     let newState = stateDescriptions[stateCode].name || 'Unknown State';
     let healthStatus = values[2] === 1;
     
