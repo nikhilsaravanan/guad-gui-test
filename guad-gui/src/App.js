@@ -330,41 +330,29 @@ function App() {
     }
   };
 
-  // Generate dummy data for packet types not connected to real sensors
-  let dummyCounter = 0;
-  const dummyGyroTable = [0.12, -0.34, 0.56, -0.78, 0.91, -0.23, 0.45, -0.67, 0.89,
-                          -0.55, 0.33, -0.77, 0.14, -0.62, 0.88, -0.41, 0.29, -0.16,
-                          0.73, -0.48, 0.19, -0.85, 0.37, -0.52, 0.64, -0.11, 0.96];
-  const dummyAccelTable = [0.05, -0.03, 9.81, 0.12, -0.08, 9.78, -0.06, 0.11, 9.83,
-                           -0.10, 0.07, 9.79, 0.03, -0.14, 9.82, 0.09, -0.01, 9.80,
-                           -0.04, 0.06, 9.77, 0.08, -0.09, 9.84, -0.02, 0.13, 9.76];
-  const dummyGapTable = [10.2, 9.8, 10.5, 10.1, 9.9, 10.4, 10.3, 9.7,
-                         10.6, 10.0, 9.6, 10.7, 10.1, 9.5, 10.8, 10.3,
-                         9.4, 10.9, 10.2, 9.3, 10.0, 10.5, 9.8, 10.4];
-  const dummyBattTable = [3.72, 3.68, 3.71, 3.65, 3.74, 3.69, 3.73, 3.66,
-                          3.70, 3.67, 3.75, 3.63, 3.71, 3.68, 3.76, 3.64];
+  // Generate random dummy data for packet types not connected to real sensors
+  const rand = (min, max) => Math.random() * (max - min) + min;
 
   const dispatchDummyData = () => {
-    dummyCounter++;
-    const gOff = (dummyCounter * 9) % 27;
-    const aOff = (dummyCounter * 9) % 27;
-    const hOff = (dummyCounter * 8) % 24;
-
-    // IMU Gyroscope
-    packetHandlers[1](dummyGyroTable.slice(gOff, gOff + 9).concat(
-      gOff + 9 > 27 ? dummyGyroTable.slice(0, (gOff + 9) - 27) : []
-    ));
-    // IMU Accelerometer
-    packetHandlers[2](dummyAccelTable.slice(aOff, aOff + 9).concat(
-      aOff + 9 > 27 ? dummyAccelTable.slice(0, (aOff + 9) - 27) : []
-    ));
-    // Gap Height
-    packetHandlers[3](dummyGapTable.slice(hOff, hOff + 8).concat(
-      hOff + 8 > 24 ? dummyGapTable.slice(0, (hOff + 8) - 24) : []
-    ));
-    // Battery
-    const battValues = Array.from({length: 144}, (_, i) => dummyBattTable[(dummyCounter + i) % 16]);
-    packetHandlers[6](battValues);
+    // IMU Gyroscope: 9 values, angular velocity in deg/s
+    packetHandlers[1]([
+      rand(-2, 2), rand(-2, 2), rand(-1, 1),
+      rand(-2, 2), rand(-2, 2), rand(-1, 1),
+      rand(-2, 2), rand(-2, 2), rand(-1, 1)
+    ]);
+    // IMU Accelerometer: 9 values, m/s^2 (Z ~9.81 gravity)
+    packetHandlers[2]([
+      rand(-0.15, 0.15), rand(-0.15, 0.15), rand(9.75, 9.85),
+      rand(-0.15, 0.15), rand(-0.15, 0.15), rand(9.75, 9.85),
+      rand(-0.15, 0.15), rand(-0.15, 0.15), rand(9.75, 9.85)
+    ]);
+    // Gap Height: 8 values, mm (levitating ~8-12mm)
+    packetHandlers[3]([
+      rand(9, 11), rand(9, 11), rand(9, 11), rand(9, 11),
+      rand(9, 11), rand(9, 11), rand(9, 11), rand(9, 11)
+    ]);
+    // Battery: 144 cells, nominal 3.5-3.9V
+    packetHandlers[6](Array.from({length: 144}, () => rand(3.55, 3.85)));
   };  
 
     // Utility function to extract sensor values from a data string
