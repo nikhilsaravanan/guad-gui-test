@@ -839,3 +839,122 @@ a,
   margin-bottom: 0;
 }
 
+/* ─── Mobile Responsive ─── */
+@media (max-width: 768px) {
+  /* Let the page scroll vertically */
+  body, html {
+    overflow: auto;
+  }
+
+  .App {
+    overflow: auto;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .container {
+    flex-direction: column;
+    overflow: auto;
+    height: auto;
+    min-height: calc(100vh - 3rem);
+  }
+
+  /* Remove the sidebar padding on main content */
+  .main-content {
+    padding-right: 0.75rem;
+    overflow: visible;
+    max-height: none;
+  }
+
+  /* Sidebar: full-width overlay */
+  .side-panel {
+    width: 100%;
+    left: 0;
+    right: 0;
+    top: 3rem;
+    bottom: 0;
+    box-shadow: none;
+  }
+
+  /* Hide the pod image on mobile — it blocks content */
+  .pod-image-container {
+    display: none;
+  }
+
+  /* Stack columns vertically */
+  .half1 {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .col1, .col2, .col3 {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .col1 {
+    align-items: stretch;
+  }
+
+  .button-section {
+    max-width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* Stack speed/acceleration and gap height vertically */
+  .top-middle-section {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .top-middle-section .speed-acceleration-section,
+  .top-middle-section .sensor-data-section {
+    max-width: 100%;
+    min-height: auto;
+  }
+
+  /* Stack temperature hubs vertically */
+  .temp-sensors-grid {
+    flex-direction: column;
+  }
+
+  /* State pills wrap nicely */
+  .state-pills-bar {
+    gap: 0.25rem;
+  }
+
+  .state-pill {
+    font-size: 0.55rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  /* Hero section stack */
+  .hero-section {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* Tabs scroll if needed */
+  .tabs {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .tabs button {
+    font-size: 0.6rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  /* Console wider */
+  .console {
+    width: 100%;
+  }
+
+  /* Progress bar sizing */
+  .progress-bar {
+    margin: 0 0.25rem;
+  }
+}
+
