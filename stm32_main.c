@@ -181,6 +181,54 @@ void print_hall_packet(void) {
            hallSensors[2].field_mt);
 }
 
+// Lookup tables for cycling dummy values
+const float dummy_gyro[] = {0.12, -0.34, 0.56, -0.78, 0.91, -0.23, 0.45, -0.67, 0.89,
+                            -0.55, 0.33, -0.77, 0.14, -0.62, 0.88, -0.41, 0.29, -0.16,
+                            0.73, -0.48, 0.19, -0.85, 0.37, -0.52, 0.64, -0.11, 0.96};
+const float dummy_accel[] = {0.05, -0.03, 9.81, 0.12, -0.08, 9.78, -0.06, 0.11, 9.83,
+                             -0.10, 0.07, 9.79, 0.03, -0.14, 9.82, 0.09, -0.01, 9.80,
+                             -0.04, 0.06, 9.77, 0.08, -0.09, 9.84, -0.02, 0.13, 9.76};
+const float dummy_gap[] = {10.2, 9.8, 10.5, 10.1, 9.9, 10.4, 10.3, 9.7,
+                           10.6, 10.0, 9.6, 10.7, 10.1, 9.5, 10.8, 10.3,
+                           9.4, 10.9, 10.2, 9.3, 10.0, 10.5, 9.8, 10.4};
+const float dummy_batt[] = {3.72, 3.68, 3.71, 3.65, 3.74, 3.69, 3.73, 3.66,
+                            3.70, 3.67, 3.75, 3.63, 3.71, 3.68, 3.76, 3.64};
+
+// Dummy data packets for sensors not yet connected
+void print_dummy_imu_gyro(void) {
+    int off = (packetCounter * 9) % 27;
+    printf("1: %lu,%d,%d,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",
+           packetCounter, stateCode, healthStatus,
+           dummy_gyro[(off+0)%27], dummy_gyro[(off+1)%27], dummy_gyro[(off+2)%27],
+           dummy_gyro[(off+3)%27], dummy_gyro[(off+4)%27], dummy_gyro[(off+5)%27],
+           dummy_gyro[(off+6)%27], dummy_gyro[(off+7)%27], dummy_gyro[(off+8)%27]);
+}
+
+void print_dummy_imu_accel(void) {
+    int off = (packetCounter * 9) % 27;
+    printf("2: %lu,%d,%d,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\r\n",
+           packetCounter, stateCode, healthStatus,
+           dummy_accel[(off+0)%27], dummy_accel[(off+1)%27], dummy_accel[(off+2)%27],
+           dummy_accel[(off+3)%27], dummy_accel[(off+4)%27], dummy_accel[(off+5)%27],
+           dummy_accel[(off+6)%27], dummy_accel[(off+7)%27], dummy_accel[(off+8)%27]);
+}
+
+void print_dummy_gap_height(void) {
+    int off = (packetCounter * 8) % 24;
+    printf("3: %lu,%d,%d,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",
+           packetCounter, stateCode, healthStatus,
+           dummy_gap[(off+0)%24], dummy_gap[(off+1)%24], dummy_gap[(off+2)%24], dummy_gap[(off+3)%24],
+           dummy_gap[(off+4)%24], dummy_gap[(off+5)%24], dummy_gap[(off+6)%24], dummy_gap[(off+7)%24]);
+}
+
+void print_dummy_battery(void) {
+    printf("6: %lu,%d,%d", packetCounter, stateCode, healthStatus);
+    for (int i = 0; i < 144; i++) {
+        printf(",%.2f", dummy_batt[(packetCounter + i) % 16]);
+    }
+    printf("\r\n");
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -234,8 +282,15 @@ int main(void)
       update_temp_sensors();
       update_hall_sensors();
 
+      // Real sensor data
       print_temp_packet();
       print_hall_packet();
+
+      // Dummy data for unconnected sensors
+      print_dummy_imu_gyro();
+      print_dummy_imu_accel();
+      print_dummy_gap_height();
+      print_dummy_battery();
 
       packetCounter++;
 
