@@ -340,16 +340,16 @@ function App() {
       rand(-2, 2), rand(-2, 2), rand(-1, 1),
       rand(-2, 2), rand(-2, 2), rand(-1, 1)
     ]);
-    // IMU Accelerometer: 9 values, m/s^2 (Z ~9.81 gravity)
+    // IMU Accelerometer: 9 values, m/s^2 (X forward accel 1-6, Y lateral, Z gravity)
     packetHandlers[2]([
-      rand(-0.15, 0.15), rand(-0.15, 0.15), rand(9.75, 9.85),
-      rand(-0.15, 0.15), rand(-0.15, 0.15), rand(9.75, 9.85),
-      rand(-0.15, 0.15), rand(-0.15, 0.15), rand(9.75, 9.85)
+      rand(1, 6), rand(-1, 1), rand(9.5, 10.1),
+      rand(1, 6), rand(-1, 1), rand(9.5, 10.1),
+      rand(1, 6), rand(-1, 1), rand(9.5, 10.1)
     ]);
-    // Gap Height: 8 values, mm (levitating ~8-12mm)
+    // Gap Height: 8 values, mm (scale 0-20mm, realistic levitation variation)
     packetHandlers[3]([
-      rand(9, 11), rand(9, 11), rand(9, 11), rand(9, 11),
-      rand(9, 11), rand(9, 11), rand(9, 11), rand(9, 11)
+      rand(2, 18), rand(2, 18), rand(2, 18), rand(2, 18),
+      rand(2, 18), rand(2, 18), rand(2, 18), rand(2, 18)
     ]);
     // Battery: 144 cells, nominal 3.5-3.9V
     packetHandlers[6](Array.from({length: 144}, () => rand(3.55, 3.85)));
