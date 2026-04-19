@@ -338,6 +338,8 @@ function App() {
     return matches ? matches.map(parseFloat) : [];
   };
 
+  const EXPECTED_VALUE_COUNTS = { 1: 9, 2: 9, 3: 8, 4: 10, 5: 12, 6: 144 };
+
   const processSerialData = (dataString) => {
     console.log("Received data:", dataString);  // Log the raw data for debugging
 
@@ -347,7 +349,17 @@ function App() {
         addToConsole("Radio Connection Lost");  // Add to console
         return;
     }
-  
+
+    // Detect merged packets (e.g., "5: ...,0.04: 608,..." where \r\n was lost)
+    // Split on pattern where a digit is followed by a colon (packet header)
+    const mergedMatch = dataString.match(/^(\d+:\s.+?)(\d+:\s.+)$/);
+    if (mergedMatch) {
+      console.warn("Merged packets detected, splitting:", dataString);
+      processSerialData(mergedMatch[1].trim());
+      processSerialData(mergedMatch[2].trim());
+      return;
+    }
+
     let packetInfo, data;
     try {
       [packetInfo, data] = dataString.split(':');
@@ -359,23 +371,32 @@ function App() {
       console.error("Error splitting data string:", dataString, error);
       return;
     }
-  
+
     let packetType = parseInt(packetInfo.trim(), 10);
     let values = data.split(',').map(Number);
-    
+
     let stateCode = values[1];
     if (isNaN(stateCode) || stateCode < 0 || stateCode >= stateDescriptions.length) {
       console.error("Invalid stateCode:", stateCode, "from data:", dataString);
       return;
     }
+
+    // Validate value count before dispatching
+    const dataValues = values.slice(3);
+    const expectedCount = EXPECTED_VALUE_COUNTS[packetType];
+    if (expectedCount && dataValues.length < expectedCount) {
+      console.error("Incomplete packet type", packetType, "- expected", expectedCount, "values, got", dataValues.length);
+      return;
+    }
+
     let newState = stateDescriptions[stateCode].name || 'Unknown State';
     let healthStatus = values[2] === 1;
-    
+
     dispatch({ type: 'UPDATE_POD_STATE', payload: newState });
     dispatch({ type: 'UPDATE_POD_HEALTH', payload: healthStatus });
-  
+
     if (packetHandlers.hasOwnProperty(packetType)) {
-      packetHandlers[packetType](values.slice(3)); // Pass only the data values
+      packetHandlers[packetType](dataValues); // Pass only the data values
     }
 
     // Save to MongoDB if enabled and connected
